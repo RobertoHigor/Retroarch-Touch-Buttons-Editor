@@ -17,13 +17,13 @@ public class Imagem {
 	}
 
 	public float getPosX() {
-		return posX * 1280;
+		return posX;
 	}
 	public void setPosX(float posX) {
 		this.posX = posX;
 	}
 	public float getPosY() {
-		return posY * 720;
+		return posY;
 	}
 	public void setPosY(float posY) {
 		this.posY = posY;

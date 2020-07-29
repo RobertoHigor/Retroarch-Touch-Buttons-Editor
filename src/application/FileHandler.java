@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,16 +21,17 @@ public class FileHandler {
 		try {
 			conteudoArquivo = new ArrayList<>(Files.readAllLines(arquivo.toPath(), StandardCharsets.UTF_8));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	
+	// TODO Procurar classe Java para leitura de .cfg
 	// Retornar uma lista de imagens
 	public List<Imagem> retornarImagens()
 	{
 		List<Imagem> imagens = new ArrayList<>();
+		List<String> nomeImagens = new ArrayList<>();
+		Queue<Float> listaAtributos= new LinkedList<>();
 		Matcher matcherOverlay;
 		Matcher matcherDesc;
 		Matcher matcherImage;
@@ -48,43 +51,56 @@ public class FileHandler {
 			// Se for uma descrição de overlay
 			if (matcherOverlay.find())
 			{
-				//System.out.println("Achou overlay na linha: " + conteudoLinha);
-				int indiceAposMatch = matcherOverlay.end();				
-				System.out.println(conteudoLinha.substring(indiceAposMatch, conteudoLinha.length()));
+				adicionarNomeImagem(nomeImagens, matcherOverlay, conteudoLinha);
 			// Senão, se for uma descrição de coordenada
 			} else if (matcherDesc.find())
 			{
-				matcherImage = patternImageValues.matcher(conteudoLinha);
-				List<Float> listaAtributos= new ArrayList<>();
-				//Enquanto houver coordenada
-				while (matcherImage.find())
-				{					
-					//System.out.println(matcherImage.group());
-					listaAtributos.add(Float.parseFloat(matcherImage.group()));					
-				}
-				
-				imagens.add(atribuirImagem(listaAtributos));				
+				adicionarAtributos(listaAtributos, patternImageValues, conteudoLinha);				
 			}
 		}
 		
-		// ler até achar descx
-			// Se for descx_overlay
-				// adicionar a string depois do "=" como nome da imgem
-			//Senão
-				// Pegar os valores entre as vírgulas
-				// 2 e 3 são posição
-				// 5 e 6 são tamanho
-		return null;
+		criarImagens(imagens, nomeImagens, listaAtributos);
+		
+		return imagens;
+	}
+
+
+	private void criarImagens(List<Imagem> imagens, List<String> nomeImagens, Queue<Float> listaAtributos) {
+		for (int i = 0; i < nomeImagens.size(); i++) {
+			imagens.add(atribuirImagem(nomeImagens.get(i), listaAtributos));
+		}
+	}
+
+
+	private void adicionarAtributos(Queue<Float> listaAtributos, Pattern patternImageValues, String conteudoLinha) {
+		Matcher matcherImage;
+		matcherImage = patternImageValues.matcher(conteudoLinha);				
+		//Enquanto houver coordenada
+		while (matcherImage.find())
+		{				
+			//System.out.println(matcherImage.group());
+			listaAtributos.add(Float.parseFloat(matcherImage.group()));					
+		}
+	}
+
+
+	private void adicionarNomeImagem(List<String> nomeImagens, Matcher matcherOverlay, String conteudoLinha) {
+		//System.out.println("Achou overlay na linha: " + conteudoLinha);
+		int indiceAposMatch = matcherOverlay.end();	
+		nomeImagens.add("src\\application\\img\\"+conteudoLinha.substring(indiceAposMatch, conteudoLinha.length()));
+		System.out.println(conteudoLinha.substring(indiceAposMatch, conteudoLinha.length()));
 	}
 	
+	// TODO: Conseguir ler descrições fora de ordem
 	// Atribuir os valores da lista para as propriedades do objeto Imagem
-	private Imagem atribuirImagem(List<Float> listaAtributos)
+	private Imagem atribuirImagem(String nomeImagem, Queue<Float> listaAtributos)
 	{
 		Imagem img = new Imagem();
-		img.setPosX(listaAtributos.get(0));
-		img.setPosY(listaAtributos.get(1));
-		img.setRangeX(listaAtributos.get(2));
-		img.setRangeX(listaAtributos.get(3));
+		img.setNome(nomeImagem);
+		img.setPosX(listaAtributos.poll());
+		img.setPosY(listaAtributos.poll());
+		img.setRangeX(listaAtributos.poll());
+		img.setRangeY(listaAtributos.poll());
 		
 		return img;
 	}

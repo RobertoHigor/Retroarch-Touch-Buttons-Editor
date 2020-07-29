@@ -22,58 +22,45 @@ public class Controller implements Initializable { // Para carregar a imagem ass
 	
 	private void AdicionarImagens(Pane pane)
 	{
+		FileHandler file = new FileHandler();
 		List<Imagem> imagens = new ArrayList<>();
-		Imagem img1 = new Imagem();
-		Imagem img2 = new Imagem();
-		Imagem img3 = new Imagem();
-		Imagem img4 = new Imagem();
+		imagens = file.retornarImagens();		
 		
-		img1.setNome("src\\application\\img\\left.png");
-		img2.setNome("src\\application\\img\\right.png");
-		img3.setNome("src\\application\\img\\up.png");
-		img4.setNome("src\\application\\img\\down.png");
-		
-		// left
-		img1.setPosX(0.25f);
-		img1.setPosY(0.50f);
-		
-		// right
-		img2.setPosX(0.75f);
-		img2.setPosY(0.50f);
-		
-		// up
-		img3.setPosX(0.50f);
-		img3.setPosY(0.25f);
-		
-		// down
-		img4.setPosX(0.50f);
-		img4.setPosY(0.75f);
-		
-		
-		imagens.add(img1);
-		imagens.add(img2);
-		imagens.add(img3);
-		imagens.add(img4);
-		
-		
+		// TODO: Utilizar os valores da variável Range
+		// TODO: Corrigir posições
+		// Criar ImageView da imagem
 		for (int i = 0; i < imagens.size(); i++)
 		{
 			ImageView imageView = new ImageView();
 			Image image = new Image(new File(imagens.get(i).getNome()).toURI().toString());
 			
 			imageView.setImage(image);
-			imageView.setX(imagens.get(i).getPosX());
-			imageView.setY(imagens.get(i).getPosY());
-			
+			imageView.setX(converterCoordenada(imagens.get(i).getPosX(), 'x'));
+			imageView.setY(converterCoordenada(imagens.get(i).getPosY(), 'y'));
+			imageView.setFitHeight(imagens.get(i).getRangeY() * imagePane.getPrefHeight());
+			imageView.setFitWidth(imagens.get(i).getRangeX() * imagePane.getPrefWidth());
+					
 			pane.getChildren().add(imageView);
+
 		}
 		
 	}
 	
-	private float converterCoordenada(float coordenada)
+	private float converterCoordenada(float coordenada, char tipo)
 	{
-		float width = 720; //(float) (1280 - imageView.getFitWidth());;
-		System.out.println(width);
-		return width * coordenada;
+		//float width = 720; (float) (1280 - imageView.getFitWidth());;
+		float width = (float) imagePane.getPrefWidth();
+		float height = (float) imagePane.getPrefHeight();	
+		
+		if (tipo=='x')
+		{
+			return coordenada * width;
+		}
+		if (tipo=='y')
+		{
+			return coordenada * height;
+		}
+		
+		return 100f;
 	}
  }
