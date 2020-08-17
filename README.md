@@ -3,8 +3,8 @@ Um projeto de estudo com JavaFX com o objetivo de ler o arquivo .cfg do overlay 
 
 O objetivo atual é conseguir ler o arquivo teste.cfg e exibir a seguinte imagem
 
-![alt](src\application\img\objetivo.jpg)
+![alt](src/application/img/objetivo.jpg)
 
 Atualmente, esse é o estado da aplicação
 
-![alt](src\application\img\atual.jpg)
+![alt](src/application/img/atual.jpg)
