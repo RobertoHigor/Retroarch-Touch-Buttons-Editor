@@ -1,4 +1,4 @@
-package application;
+package application.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,13 +11,14 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FileHandler {
+import application.model.Imagem;
+
+public class TextFileReader implements FileReader {
 	private List<String> conteudoArquivo;
 	
-	public FileHandler()
+	public void setConfig(String cfg)
 	{
-		File arquivo = new File("src\\\\application\\img\\teste.cfg");
-		
+		File arquivo = new File("src\\\\application\\img\\" + cfg + ".cfg");
 		try {
 			conteudoArquivo = new ArrayList<>(Files.readAllLines(arquivo.toPath(), StandardCharsets.UTF_8));
 		} catch (IOException e) {
@@ -34,7 +35,6 @@ public class FileHandler {
 		Queue<Float> listaAtributos= new LinkedList<>();
 		Matcher matcherOverlay;
 		Matcher matcherDesc;
-		Matcher matcherImage;
 		
 		Pattern patternOverlay = Pattern.compile("desc(\\d|\\d\\d)\\Soverlay\\s=\\s");
 		Pattern patternDescriptor = Pattern.compile("desc(\\d|\\d\\d)\\s=\\s");
@@ -88,7 +88,7 @@ public class FileHandler {
 		//System.out.println("Achou overlay na linha: " + conteudoLinha);
 		int indiceAposMatch = matcherOverlay.end();	
 		nomeImagens.add("src\\application\\img\\"+conteudoLinha.substring(indiceAposMatch, conteudoLinha.length()));
-		System.out.println(conteudoLinha.substring(indiceAposMatch, conteudoLinha.length()));
+		System.out.println("Nome da imagem: " + conteudoLinha.substring(indiceAposMatch, conteudoLinha.length()));
 	}
 	
 	// TODO: Conseguir ler descrições fora de ordem
@@ -101,12 +101,12 @@ public class FileHandler {
 		img.setPosY(listaAtributos.poll());
 		img.setRangeX(listaAtributos.poll());
 		img.setRangeY(listaAtributos.poll());
-		
+		System.out.println("Atribuida a imagem: " + img.getNome() + " Nas coordenadas x:" + img.getPosX() + ", y: " + img.getPosY());
 		return img;
 	}
 	
 	public static void main(String[] args) {
-		FileHandler file = new FileHandler();
+		TextFileReader file = new TextFileReader();
 		file.retornarImagens();
 	}
 

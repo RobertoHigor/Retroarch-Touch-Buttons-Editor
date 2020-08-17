@@ -17,7 +17,7 @@ public class Main extends Application {
 			
 			// Carregar FXML
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(Main.class.getResource("FXMLtela.fxml"));			
+			loader.setLocation(Main.class.getResource("FXMLtela.fxml"));
 			rootLayout = loader.load();	
 			
 			// Definindo layout
