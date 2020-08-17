@@ -12,14 +12,19 @@ import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.TilePane;
 
 public class Controller implements Initializable { // Para carregar a imagem assim que abrir
 
 	public Pane imagePane;
+	private float width;
+	private float height;
 	
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1) {		
+	public void initialize(URL arg0, ResourceBundle arg1) {
+		//width = (float) imagePane.getPrefWidth();
+		width = 1280;
+		height = 720;
+		//height = (float) imagePane.getPrefHeight();
 		AdicionarImagens(imagePane);
 	}  
 	
@@ -29,7 +34,7 @@ public class Controller implements Initializable { // Para carregar a imagem ass
 		config.setConfig("teste");
 		List<Imagem> imagens = config.retornarImagens();		
 		
-		//addBackground(pane);
+		addBackground(pane);
 		
 		for (int i = 0; i < imagens.size(); i++)
 		{
@@ -38,7 +43,11 @@ public class Controller implements Initializable { // Para carregar a imagem ass
 			Imagem tmpImg = imagens.get(i);
 			
 			String imgName = tmpImg.getNome();
-			System.out.println(imgName);
+			
+			System.out.println("Nome: "+imgName
+					+" RangeX: "+tmpImg.getRangeX()
+					+" RangeY: "+tmpImg.getRangeY());
+			
 			Image image = new Image(
 					new File("src/application/img/"+imgName).toURI().toString());
 			
@@ -49,40 +58,46 @@ public class Controller implements Initializable { // Para carregar a imagem ass
 
 	}
 
-	private void addBackground(TilePane pane) {
+	private void addBackground(Pane pane) {
 		// Criar ImageView da imagem
 		ImageView background = new ImageView();
 		Image backgroundImage = new Image(new File("src/application/img/background.png").toURI().toString());
 		background.setImage(backgroundImage);
-		background.setFitWidth(1280);
-		background.setFitHeight(720);
+		background.setFitWidth(width);
+		background.setFitHeight(height);
 
 		pane.getChildren().add(background);
 	}
 
 	// Get the Imagem class attributes and put it on the ImageView
 	private void setImageViewAttributes(ImageView imageView, Imagem tmpImg, Image image) {
-		// Set image attributes
 		imageView.setImage(image);
-		imageView.setX(converterCoordenada(tmpImg.getPosX(), 'x'));
-		imageView.setY(converterCoordenada(tmpImg.getPosY(), 'y'));
-		imageView.setFitHeight(image.getHeight() + (image.getHeight() * tmpImg.getRangeY()) * 2);
-		imageView.setFitWidth(image.getWidth() + (image.getWidth() * tmpImg.getRangeX()) * 2);
+		
+		// Set Image Attributes
+		float imgHeight = (height * 2) * tmpImg.getRangeY();
+		float imgWidth = (width * 2) * tmpImg.getRangeX();
+		imageView.setFitHeight(imgHeight);	
+		imageView.setFitWidth(imgWidth);
+		
+		System.out.println(image.getHeight() + (image.getHeight() * tmpImg.getRangeY()));
+		
+		// Getting center point to use as a pivot
+		float centerX = (float) (imgWidth / 2);
+		float centerY = (float) (imgHeight / 2);
+		
+		imageView.setX(converterCoordenada(tmpImg.getPosX(), 'x', centerX));
+		imageView.setY(converterCoordenada(tmpImg.getPosY(), 'y', centerY));
 	}
 	
-	private float converterCoordenada(float coordenada, char tipo)
-	{
-		//float width = 720; (float) (1280 - imageView.getFitWidth());;
-		float width = (float) imagePane.getPrefWidth();
-		float height = (float) imagePane.getPrefHeight();	
-		
+	private float converterCoordenada(float coordenada, char tipo, double center)
+	{	
 		if (tipo=='x')
 		{
-			return coordenada * width;
+			return (float) ((coordenada * width) - center);
 		}
 		if (tipo=='y')
 		{
-			return coordenada * height;
+			return (float) ((coordenada * height) - center);
 		}
 		
 		return 100f;

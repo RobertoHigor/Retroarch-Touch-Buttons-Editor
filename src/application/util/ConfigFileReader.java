@@ -76,16 +76,4 @@ public class ConfigFileReader implements FileReader {
 		
 		return img;
 	}
-
-	public static void main(String[] args) {
-		ConfigFileReader cfg = new ConfigFileReader();
-		cfg.setConfig("teste");
-		List<Imagem> testeImagens = new ArrayList<>();
-		testeImagens = cfg.retornarImagens();
-		
-		Imagem img = new Imagem();
-		img = testeImagens.get(0);
-		System.out.println(img.getNome());
-	}
-
 }
