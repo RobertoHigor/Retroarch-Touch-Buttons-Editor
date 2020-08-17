@@ -9,6 +9,7 @@ import application.model.Imagem;
 import application.util.ConfigFileReader;
 import application.util.FileReader;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -16,25 +17,34 @@ import javafx.scene.layout.Pane;
 public class Controller implements Initializable { // Para carregar a imagem assim que abrir
 
 	public Pane imagePane;
+	public Button refreshButton;
 	private float width;
 	private float height;
+	private double mouseX;
+	private double mouseY;
 	
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-		//width = (float) imagePane.getPrefWidth();
-		width = 1280;
-		height = 720;
-		//height = (float) imagePane.getPrefHeight();
+		width = (float) imagePane.getPrefWidth();
+		height = (float) imagePane.getPrefHeight();
 		AdicionarImagens(imagePane);
+		
+		// Clear and refresh the cfg file
+		refreshButton.setOnAction(event -> {
+			imagePane.getChildren().clear();
+			imagePane.getChildren().add(refreshButton);
+			AdicionarImagens(imagePane);
+		});
 	}  
 	
+// Add images to the Pane
 	private void AdicionarImagens(Pane pane)
 	{
 		FileReader config = new ConfigFileReader();
 		config.setConfig("teste");
 		List<Imagem> imagens = config.retornarImagens();		
 		
-		addBackground(pane);
+		//addBackground(pane);
 		
 		for (int i = 0; i < imagens.size(); i++)
 		{
@@ -44,20 +54,36 @@ public class Controller implements Initializable { // Para carregar a imagem ass
 			
 			String imgName = tmpImg.getNome();
 			
-			System.out.println("Nome: "+imgName
+			/*System.out.println("Nome: "+imgName
 					+" RangeX: "+tmpImg.getRangeX()
 					+" RangeY: "+tmpImg.getRangeY());
+					*/
 			
 			Image image = new Image(
 					new File("src/application/img/"+imgName).toURI().toString());
 			
 			setImageViewAttributes(imageView, tmpImg, image);
+			
+			// Soure for drag code: https://stackoverflow.com/a/34005708
+			imageView.setOnMousePressed(event -> {
+                mouseX = imageView.getX() - event.getSceneX();
+                mouseY = imageView.getY() - event.getSceneY();
+            });
+			
+            imageView.setOnMouseDragged(event -> { 
+            	imageView.setX(event.getSceneX() + mouseX);
+            	imageView.setY(event.getSceneY() + mouseY);
+            	// Fórmula para descobrir a coordenada
+            	double coordenada = event.getSceneX() / width;
+            	System.out.println("Coordenada: " + coordenada);
+            });
 					
 			pane.getChildren().add(imageView);
 		}	
 
 	}
 
+	// Add a debug diagram background
 	private void addBackground(Pane pane) {
 		// Criar ImageView da imagem
 		ImageView background = new ImageView();
@@ -79,7 +105,7 @@ public class Controller implements Initializable { // Para carregar a imagem ass
 		imageView.setFitHeight(imgHeight);	
 		imageView.setFitWidth(imgWidth);
 		
-		System.out.println(image.getHeight() + (image.getHeight() * tmpImg.getRangeY()));
+		//System.out.println(image.getHeight() + (image.getHeight() * tmpImg.getRangeY()));
 		
 		// Getting center point to use as a pivot
 		float centerX = (float) (imgWidth / 2);
@@ -89,6 +115,7 @@ public class Controller implements Initializable { // Para carregar a imagem ass
 		imageView.setY(converterCoordenada(tmpImg.getPosY(), 'y', centerY));
 	}
 	
+	// Convert getPos to imageView coordenate
 	private float converterCoordenada(float coordenada, char tipo, double center)
 	{	
 		if (tipo=='x')

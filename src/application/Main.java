@@ -23,7 +23,7 @@ public class Main extends Application {
 			// Definindo layout
 			Scene scene = new Scene(rootLayout);
 			
-			primaryStage.setTitle("Oi");
+			primaryStage.setTitle("Retroarch Overlay Viewer");
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {
